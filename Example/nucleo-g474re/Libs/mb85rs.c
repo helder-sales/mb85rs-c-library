@@ -24,27 +24,22 @@ static void MB85RS_WriteOpCode(MB85RS_OpCode_t opCode) {
 }
 
 static void MB85RS_SetWEL(void) {
-    MB85RS_OpCode_t opCode = WREN;
-
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(WREN);
     mb85rs.CS_Disable();
 }
 
 static void MB85RS_ResetWEL(void) {
-    MB85RS_OpCode_t opCode = WRDI;
-
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(WRDI);
     mb85rs.CS_Disable();
 }
 
 uint32_t MB85RS_GetRDID(void) {
     uint8_t rdidArray[4] = {0};
-    MB85RS_OpCode_t opCode = RDID;
 
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(RDID);
     mb85rs.SPI_ReceiveBytes(rdidArray, 4);
     mb85rs.CS_Disable();
 
@@ -58,23 +53,21 @@ uint32_t MB85RS_GetRDID(void) {
 }
 
 void MB85RS_Read(uint16_t address, uint8_t *rxBuffer, uint8_t bufSizeInBytes) {
-    MB85RS_OpCode_t opCode = READ;
     uint8_t addressArray[2] = {address >> 8, address & 0xFF};
 
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(READ);
     mb85rs.SPI_TransmitBytes(addressArray, 2);
     mb85rs.SPI_ReceiveBytes(rxBuffer, bufSizeInBytes);
     mb85rs.CS_Disable();
 }
 
 void MB85RS_Write(uint16_t address, uint8_t *txBuffer, uint8_t bufSizeInBytes) {
-    MB85RS_OpCode_t opCode = WRITE;
     uint8_t addressArray[2] = {address >> 8, address & 0xFF};
 
     MB85RS_SetWEL();
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(WRITE);
     mb85rs.SPI_TransmitBytes(addressArray, 2);
     mb85rs.SPI_TransmitBytes(txBuffer, bufSizeInBytes);
     mb85rs.CS_Disable();
@@ -83,10 +76,9 @@ void MB85RS_Write(uint16_t address, uint8_t *txBuffer, uint8_t bufSizeInBytes) {
 
 static uint8_t MB85RS_ReadStatusRegister(void) {
     uint8_t statusRegister = 0;
-    MB85RS_OpCode_t opCode = RDSR;
 
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(RDSR);
     mb85rs.SPI_ReceiveBytes(&statusRegister, 1);
     mb85rs.CS_Disable();
 
@@ -94,12 +86,10 @@ static uint8_t MB85RS_ReadStatusRegister(void) {
 }
 
 static void MB85RS_WriteStatusRegister(uint8_t data) {
-    MB85RS_OpCode_t opCode = WRSR;
-
     mb85rs.WP_Disable();
     MB85RS_SetWEL();
     mb85rs.CS_Enable();
-    MB85RS_WriteOpCode(opCode);
+    MB85RS_WriteOpCode(WRSR);
     mb85rs.SPI_TransmitBytes(&data, 1);
     mb85rs.CS_Disable();
     MB85RS_ResetWEL();
